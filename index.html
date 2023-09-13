@@ -6,6 +6,32 @@
     <title>Title</title>
 </head>
 <body>
-<script src="./scripts/index.js"></script>
+<div class="title">
+    <h1>Алгоритмы сортировки</h1>
+    <span>понятные и анимированные</span>
+</div>
+<form class="form">
+    <label class="numbers-label" for="numbers">
+        <span>Введите числа через запятую, для их сортировки</span>
+        <input id="numbers" type="text">
+    </label>
+</form>
+<h2>Выберите сортировку</h2>
+<ul class="algorithms-list">
+    <li class="algorithm-item button-active" data-sort="quick">Быстрая сортировка</li>
+    <li class="algorithm-item" data-sort="bubble">Пузырьковая сортировка</li>
+    <li class="algorithm-item" data-sort="select">Сортировка выбором</li>
+    <li class="algorithm-item" data-sort="insert">Сортировка вставками</li>
+    <li class="algorithm-item" data-sort="shell">Сортировка Шелла</li>
+</ul>
+<div class="buttons">
+    <button class="media-button" data-media="start">Запустить</button>
+    <button class="media-button" data-media="pause">Остановить</button>
+    <button class="media-button" data-media="reset">Сбросить</button>
+</div>
+<h3 class="sort-title"></h3>
+<div class="sort"></div>
+<div class="sort-text"></div>
+<script type="module" src="./scripts/index.js"></script>
 </body>
 </html>
