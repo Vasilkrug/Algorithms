@@ -7,4 +7,4 @@
   <li>Можно поставить соритровку на паузу и затем продолжить</li>
   <li>К каждому алгоритму соритровки есть описание</li>
 </ul>
-<p>Ознакомиться можно <a href="vasilkrug.github.io/Algorithms/">здесь</a></p>
+<p>Ознакомиться можно <a href="https://vasilkrug.github.io/Algorithms/">здесь</a></p>
