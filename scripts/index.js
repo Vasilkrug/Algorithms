@@ -1,13 +1,14 @@
-import {swap, swapRight} from "./helpers.js";
+import {sleep, swap} from "./helpers.js";
 
 const numbers = document.getElementById('numbers');
 const mediaBtns = document.querySelectorAll('.media-button');
 const sortBlock = document.querySelector('.sort');
 const sortBtns = document.querySelectorAll('.algorithm-item');
 const sortTextBlock = document.querySelector('.sort-text');
+
 let isPaused = false;
 let isStoped = false;
-let delay = 500;
+const delay = 500;
 
 //функция, которая преобразует данные из инпута в массив, пропуская не числовые символы
 const toArray = () => {
@@ -28,18 +29,15 @@ const sortTextRender = (text) => {
     sortTextBlock.innerHTML = `<p>${text}</p>`;
 };
 
-//функция задержки, для эмуляции анимации
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-//функция, которая ставит на паузу анимацию
 const pause = async () => {
     while (isPaused) {
         await sleep(100);
     }
 };
 
-//пузырьковая сортировка
-const bubbleSort = async (blocks) => {
+//все сортировки выполнены согласно алгоритмам,
+// каждая сортировка во время итерации меняет цвет фона элементов для наглядности и вызывает функцию sleep и pause
+const bubbleSort = async (blocks, sortBlock) => {
     for (let i = 0; i < blocks.length - 1; i += 1) {
         for (let j = 0; j < blocks.length - i - 1; j += 1) {
             blocks[j].style.backgroundColor = "#FF4949";
@@ -61,7 +59,7 @@ const bubbleSort = async (blocks) => {
             } else {
                 await pause();
             }
-            await sleep(delay)
+            await sleep(delay);
 
             blocks[j].style.backgroundColor = "#58B7FF";
             blocks[j + 1].style.backgroundColor = "#58B7FF";
@@ -71,11 +69,10 @@ const bubbleSort = async (blocks) => {
         blocks[0].style.backgroundColor = "#13CE66";
     }
     isPaused = false;
-    isStoped = false;
+    isStoped = true;
 };
 
-//сортировка вставками
-const insertSort = async (blocks) => {
+const insertSort = async (blocks, sortBlock) => {
     blocks[0].style.backgroundColor = "#13CE66";
     for (let i = 1; i < blocks.length; i += 1) {
         let j = i - 1;
@@ -114,47 +111,80 @@ const insertSort = async (blocks) => {
         title.innerHTML = `Элементы отсортированы`;
     }
     isPaused = false;
-    isStoped = false;
+    isStoped = true;
 };
 
-//быстрая сортировка
-const quickSort = async (blocks) => {
-    if (blocks.length <= 1) {
-        return blocks;
-    }
+const lometoPartition = async (l, r, blocks) => {
 
-    const pivot = blocks[blocks.length - 1];
-    const leftList = [];
-    const rightList = [];
 
-    for (let i = 0; i < blocks.length - 1; i++) {
-        const value = Number(blocks[i].innerHTML)
-        await sleep(delay)
+    let pivot = Number(blocks[r].innerHTML);
+    let i = l - 1;
+    blocks[r].style.backgroundColor = "#FF4949";
 
+    for (let j = l; j <= r - 1; j++) {
+
+        blocks[j].style.backgroundColor = "yellow";
+        await new Promise((resolve) =>
+            setTimeout(() => {
+                resolve();
+            }, delay)
+        );
+
+        let value = Number(blocks[j].innerHTML);
         if (isStoped) {
             return;
         }
 
         if (!isPaused) {
-            if (value < Number(pivot.innerHTML)) {
-                leftList.push(blocks[i]);
-                blocks[i].style.backgroundColor = "#FF4949";
-                await swap(pivot, blocks[i], sortBlock);
-            } else {
-                blocks[i].style.backgroundColor = "#58B7FF";
-                rightList.push(blocks[i]);
-                await swapRight(blocks[i], pivot);
-            }
+            if (value < pivot) {
+                i++;
+                let temp = blocks[i].innerText;
+                blocks[i].innerText = blocks[j].innerText;
+                blocks[j].innerText = temp;
+                blocks[i].style.backgroundColor = "orange";
+                if (i !== j) blocks[j].style.backgroundColor = "pink";
+
+                await new Promise((resolve) =>
+                    setTimeout(() => {
+                        resolve();
+                    }, delay)
+                );
+            } else blocks[j].style.backgroundColor = "pink";
         } else {
             await pause();
         }
     }
 
-    return [...await quickSort(leftList), pivot, ...await quickSort(rightList)];
+    i++;
+    let temp = blocks[i].innerText;
+    blocks[i].innerText = blocks[r].innerText;
+    blocks[r].innerText = temp;
+    blocks[r].style.backgroundColor = "pink";
+    blocks[i].style.backgroundColor = "green";
+
+    // To wait for 2100 milliseconds
+    await new Promise((resolve) =>
+        setTimeout(() => {
+            resolve();
+        }, delay * 3)
+    );
+
+    for (let k = 0; k < blocks.length; k++)
+        blocks[k].style.backgroundColor = "#13CE66";
+    return i;
 };
 
-//сортировка выбором
-const selectSort = async (blocks) => {
+const quickSort = async (l, r, blocks) => {
+    if (l < r) {
+        let pivot_idx = await lometoPartition(l, r, blocks);
+
+        await quickSort(l, pivot_idx - 1, blocks);
+
+        await quickSort(pivot_idx + 1, r, blocks);
+    }
+};
+
+const selectSort = async (blocks, sortBlock) => {
 
     for (let i = 0; i < blocks.length; i += 1) {
         let min = i;
@@ -196,16 +226,16 @@ const selectSort = async (blocks) => {
         blocks[i].style.backgroundColor = "green";
     }
     isPaused = false;
+    isStoped = true;
 };
 
-//сортировка Шелла
-const shellSort = async (blocks) => {
+const shellSort = async (blocks, blockSort) => {
     for (let i = 10; i > 0; i = Math.floor(i / 2)) {
 
         await sleep(delay);
 
         for (let j = i; j < blocks.length; j++) {
-            let temp = parseInt(blocks[j].innerHTML);
+            let temp = Number(blocks[j].innerHTML);
             let k;
 
             for (k = j; k >= i && Number(blocks[k - i].innerHTML) > temp; k -= i) {
@@ -235,10 +265,8 @@ const shellSort = async (blocks) => {
         }
     }
     isPaused = false;
-    isStoped = false;
+    isStoped = true;
 };
-//все сортировки выполнены согласно алгоритмам,
-// каждая сортировка во время итерации меняет цвет фона элементов для наглядности и вызывает функцию sleep и pause
 
 //mapping создан чтобы не прописывать if else
 const mapping = {
@@ -303,19 +331,22 @@ sortBtns.forEach(btn => {
     })
 });
 
-
 mediaBtns.forEach(button => {
-    button.addEventListener('click', () => {
+    button.addEventListener('click', async () => {
         const media = button.dataset.media;
         //запускаем алгоритм, дизейблим кнопку старта
         if (media === 'start') {
             document.querySelector('[data-media="start"]').setAttribute('disabled', 'disabled');
             sortRender();
             let blocks = document.querySelectorAll(".sort-item");
-            sortFn(blocks);
+            if (activeSort === 'quick') {
+                await sortFn(0, blocks.length - 1, blocks);
+            } else {
+                await sortFn(blocks, sortBlock);
+            }
             sortTextRender(sortText);
-            isStoped = false;
             isPaused = false;
+            isStoped = false;
         }
         if (media === 'pause') {
             //дизейблим кнопку старт, когда начажата кнопка паузы
@@ -329,7 +360,7 @@ mediaBtns.forEach(button => {
                 isPaused = true;
             }
         }
-        //сбрасываем выполнение любого алгоритма и очищаем инпут с родителем в котором рендеритмся массив
+        //сбрасываем выполнение любого алгоритма и очищаем инпут с родителем в котором рендерится массив
         if (media === 'reset') {
             document.querySelector('[data-media="start"]').removeAttribute('disabled');
             isStoped = true;

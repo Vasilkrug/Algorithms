@@ -23,3 +23,6 @@ export const swapRight = (target, afterTarget) => {
         });
     });
 };
+
+//функция задержки, для эмуляции анимации
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
